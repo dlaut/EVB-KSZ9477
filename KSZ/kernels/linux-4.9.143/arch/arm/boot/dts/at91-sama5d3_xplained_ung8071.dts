@@ -69,57 +69,6 @@
 			i2c0: i2c@f0014000 {
 				pinctrl-0 = <&pinctrl_i2c0_pu>;
 				status = "okay";
-
-				i2c_ksz9477: ksz9477@5f {
-					compatible = "microchip,ksz9477";
-					reg = <0x5f>;
-					phy-mode = "rgmii-txid";
-
-					interrupt-parent = <&pioB>;
-					interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
-					status = "disabled";
-					ports {
-						#address-cells = <1>;
-						#size-cells = <0>;
-						port@0 {
-							reg = <0>;
-							label = "lan1";
-						};
-						port@1 {
-							reg = <1>;
-							label = "lan2";
-						};
-						port@2 {
-							reg = <2>;
-							label = "lan3";
-						};
-						port@3 {
-							reg = <3>;
-							label = "lan4";
-						};
-						port@4 {
-							reg = <4>;
-							label = "lan5";
-						};
-						port@5 {
-							reg = <5>;
-							label = "cpu";
-							ethernet = <&macb0>;
-							fixed-link {
-								speed = <1000>;
-								full-duplex;
-							};
-						};
-						port@6 {
-							reg = <6>;
-							label = "lan6";
-							fixed-link {
-								speed = <1000>;
-								full-duplex;
-							};
-						};
-					};
-				};
 			};
 
 			i2c1: i2c@f0018000 {
@@ -210,20 +159,18 @@
 			};
 
 			spi1: spi@f8008000 {
-				cs-gpios = <&pioC 25 0>;
+				cs-gpios = <&pioC 28 0>;
 				id = <1>;
 				status = "okay";
-
-				ksz9477: ksz9477@0 {
-					compatible = "microchip,ksz9477";
+				
+				ksz8863: ksz8863@0 {
+					compatible = "microchip,ksz8863";
 					reg = <0>;
-					phy-mode = "rgmii-txid";
+					phy-mode = "rmii";
 
-					spi-max-frequency = <44000000>;
+					spi-max-frequency = <12000000>;
 					spi-cpha;
 					spi-cpol;
-					interrupt-parent = <&pioB>;
-					interrupts = <28 IRQ_TYPE_LEVEL_LOW>;
 					status = "okay";
 					ports {
 						#address-cells = <1>;
@@ -238,34 +185,25 @@
 						};
 						port@2 {
 							reg = <2>;
-							label = "lan3";
-						};
-						port@3 {
-							reg = <3>;
-							label = "lan4";
-						};
-						port@4 {
-							reg = <4>;
-							label = "lan5";
-						};
-						port@5 {
-							reg = <5>;
 							label = "cpu";
-							ethernet = <&macb0>;
+							ethernet = <&macb1>;
 							fixed-link {
-								speed = <1000>;
-								full-duplex;
-							};
-						};
-						port@6 {
-							reg = <6>;
-							label = "lan6";
-							fixed-link {
-								speed = <1000>;
+								speed = <100>;
 								full-duplex;
 							};
 						};
 					};
+				};
+			};
+
+			macb1: ethernet@f802c000 {
+				phy-mode = "rmii";
+				#address-cells = <1>;
+				#size-cells = <0>;
+				status = "okay";
+				fixed-link {
+					speed = <100>;
+					full-duplex;
 				};
 			};
 
@@ -289,18 +227,6 @@
 				dmas = <0>, <0>;	/* Do not use DMA for i2c2 */
 				pinctrl-0 = <&pinctrl_i2c2_pu>;
 				status = "okay";
-			};
-
-			macb1: ethernet@f802c000 {
-				phy-mode = "rmii";
-				#address-cells = <1>;
-				#size-cells = <0>;
-				status = "disabled";
-
-				fixed-link {
-					speed = <100>;
-					full-duplex;
-				};
 			};
 
 			dbgu: serial@ffffee00 {

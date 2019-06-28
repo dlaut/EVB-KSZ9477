@@ -207,10 +207,14 @@ enum {
 
 static uint get_phy_port(struct ksz_sw *sw, uint n)
 {
-if (n > sw->mib_port_cnt + 1)
-dbg_msg("  !!! %s %d\n", __func__, n);
+	printk("%s %d sw=%p\n", __FUNCTION__, __LINE__, sw);
+
+	if (n > sw->mib_port_cnt + 1)
+		dbg_msg("  !!! %s %d\n", __func__, n);
+
 	if (n >= sw->mib_port_cnt + 1)
 		n = 0;
+
 	return sw->port_info[n].phy_p;
 }
 
@@ -6285,6 +6289,7 @@ static void sw_setup_intr(struct ksz_sw *sw)
 
 static int sw_chk_id(struct ksz_sw *sw, u16 *id)
 {
+	printk("%s %d CONFIG_HAVE_KSZ8463\n", __FUNCTION__, __LINE__);
 	*id = sw->reg->r16(sw, REG_SWITCH_SIDER);
 	if ((*id & CIDER_ID_MASK) != CIDER_ID_8463 &&
 	    (*id & CIDER_ID_MASK) != CIDER_ID_8463_RLI)
@@ -6341,6 +6346,8 @@ static void sw_setup_intr(struct ksz_sw *sw)
 static int sw_chk_id(struct ksz_sw *sw, u16 *id)
 {
 	u8 mode;
+
+	printk("%s %d CONFIG_HAVE_KSZ8863\n", __FUNCTION__, __LINE__);
 
 	*id = sw->reg->r16(sw, REG_CHIP_ID0);
 	if ((*id & SWITCH_CHIP_ID_MASK) != CHIP_ID_63)
@@ -8362,6 +8369,15 @@ static int sw_setup_dev(struct ksz_sw *sw, struct net_device *dev,
 	int phy_id;
 	struct ksz_dev_map *map;
 
+	printk("%s sw=%p dev=%p %s port=%p [%d, %d, %d]\n", __FUNCTION__, sw, dev, dev_name, port, i, port_cnt, mib_port_cnt);
+	printk("%s phy_offset=%d\n", __FUNCTION__, phy_offset);
+	printk("%s sw->phy_offset=%d\n", __FUNCTION__, sw->phy_offset);
+	printk("%s sw->dev_offset=%d\n", __FUNCTION__, sw->dev_offset);
+	printk("%s sw->info=%d\n", __FUNCTION__, sw->info);
+	if (sw->info != NULL)
+		printk("%s sw->info->port_cfg=%d\n", __FUNCTION__, sw->info->port_cfg);
+
+
 	if (!phy_offset)
 		phy_offset = sw->phy_offset;
 
@@ -8391,6 +8407,7 @@ static int sw_setup_dev(struct ksz_sw *sw, struct net_device *dev,
 	}
 
 #ifdef CONFIG_KSZ_HSR
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	if (sw->eth_cnt && (sw->eth_maps[i].proto & HSR_HW)) {
 		port_cnt = sw->eth_maps[i].cnt;
 		p = sw->eth_maps[i].port;
@@ -8400,16 +8417,19 @@ static int sw_setup_dev(struct ksz_sw *sw, struct net_device *dev,
 	}
 #endif
 
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	port->port_cnt = port_cnt;
 	port->mib_port_cnt = mib_port_cnt;
 	port->first_port = p + 1;
 	port->flow_ctrl = PHY_FLOW_CTRL;
 
 #ifdef CONFIG_KSZ_STP
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	if (!i && sw->features & STP_SUPPORT)
 		prep_stp_mcast(dev);
 #endif
 
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	/* Point to port under netdev. */
 	if (phy_offset)
 		phy_id = port->first_port + phy_offset - 1;
@@ -8417,6 +8437,7 @@ static int sw_setup_dev(struct ksz_sw *sw, struct net_device *dev,
 		phy_id = 0;
 
 #ifndef NO_PHYDEV
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	/* Replace virtual port with one from network device. */
 	do {
 		struct phy_device *phydev;
@@ -8431,20 +8452,28 @@ static int sw_setup_dev(struct ksz_sw *sw, struct net_device *dev,
 		priv->port = port;
 	} while (0);
 #endif
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	if (!phy_offset)
 		phy_offset = 1;
 
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	p = get_phy_port(sw, port->first_port);
 	port->sw = sw;
 	port->linked = get_port_info(sw, p);
 
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	for (cnt = 0, n = port->first_port; cnt < port_cnt; cnt++, n++) {
+		printk("%s %d\n", __FUNCTION__, __LINE__);
 		pi = get_phy_port(sw, n);
+		printk("%s %d\n", __FUNCTION__, __LINE__);
 		info = get_port_info(sw, pi);
+		printk("%s %d\n", __FUNCTION__, __LINE__);
 		info->port_id = pi;
 		info->state = media_disconnected;
+		printk("%s %d\n", __FUNCTION__, __LINE__);
 		sw->info->port_cfg[pi].index = i;
 	}
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	sw->netdev[i] = dev;
 	sw->netport[i] = port;
 	port->netdev = dev;
@@ -8457,6 +8486,7 @@ static int sw_setup_dev(struct ksz_sw *sw, struct net_device *dev,
 		dev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
 #endif
 
+	printk("%s %d\n", __FUNCTION__, __LINE__);
 	/* Needed for inserting VLAN tag. */
 	if (sw->features & SW_VLAN_DEV)
 		dev->hard_header_len += VLAN_HLEN;
@@ -9689,9 +9719,9 @@ static int ksz_probe(struct sw_priv *ks)
 		dev_err(ks->dev, "failed to read device ID(0x%x)\n", id);
 		goto err_sw;
 	}
-	dev_info(ks->dev, "chip id 0x%04x\n", id);
+	dev_info(ks->dev, "chip id 0x%04x [ret=%d]\n", id, ret);
 
-	if (ret > 1) {
+//	if (ret > 1) {
 		sw->info = kzalloc(sizeof(struct ksz_sw_info), GFP_KERNEL);
 		if (!sw->info) {
 			ret = -ENOMEM;
@@ -9700,11 +9730,11 @@ static int ksz_probe(struct sw_priv *ks)
 
 		port_count = TOTAL_PORT_NUM;
 		mib_port_count = SWITCH_PORT_NUM;
-	} else {
-		port_count = 1;
-		mib_port_count = 1;
-		multi_dev = stp = 0;
-	}
+//	} else {
+//		port_count = 1;
+//		mib_port_count = 1;
+//		multi_dev = stp = 0;
+//	}
 
 	sw->PORT_MASK = (1 << mib_port_count) - 1;
 
