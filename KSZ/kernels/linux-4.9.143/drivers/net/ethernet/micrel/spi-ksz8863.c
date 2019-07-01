@@ -353,31 +353,40 @@ static u32 spi_rdreg32(struct spi_hw_priv *ks, u8 reg)
 
 static u8 sw_r8(struct ksz_sw *sw, unsigned reg)
 {
-	return HW_R8(sw->dev, reg);
+	u8 res = HW_R8(sw->dev, reg);
+//	printk("%s: reg=%08x, res=%08x\n", __FUNCTION__, reg, res);
+	return res;
 }
 
 static u16 sw_r16(struct ksz_sw *sw, unsigned reg)
 {
-	return HW_R16(sw->dev, reg);
+	u16 res = HW_R16(sw->dev, reg);
+//	printk("%s: reg=%08x, res=%08x\n", __FUNCTION__, reg, res);
+	return res;
 }
 
 static u32 sw_r32(struct ksz_sw *sw, unsigned reg)
 {
-	return HW_R32(sw->dev, reg);
+	u32 res = HW_R32(sw->dev, reg);
+//	printk("%s: reg=%08x, res=%08x\n", __FUNCTION__, reg, res);
+	return res;
 }
 
 static void sw_w8(struct ksz_sw *sw, unsigned reg, unsigned val)
 {
+//	printk("%s: reg=%08x, val=%08x\n", __FUNCTION__, reg, val);	
 	HW_W8(sw->dev, reg, val);
 }
 
 static void sw_w16(struct ksz_sw *sw, unsigned reg, unsigned val)
 {
+//	printk("%s: reg=%08x, val=%08x\n", __FUNCTION__, reg, val);
 	HW_W16(sw->dev, reg, val);
 }
 
 static void sw_w32(struct ksz_sw *sw, unsigned reg, unsigned val)
 {
+//	printk("%s: reg=%08x, val=%08x\n", __FUNCTION__, reg, val);
 	HW_W32(sw->dev, reg, val);
 }
 
