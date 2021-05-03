@@ -119,7 +119,8 @@ UTIL_LINUX_CONF_OPTS += \
 
 HOST_UTIL_LINUX_CONF_OPTS += \
 	--enable-libuuid \
-	--disable-libblkid --disable-libmount \
+	$(if $(BR2_PACKAGE_UTIL_LINUX_LIBBLKID),--enable-libblkid,--disable-libblkid) \
+	--disable-libmount \
 	--without-ncurses
 
 ifeq ($(BR2_PACKAGE_HOST_UTIL_LINUX),y)
