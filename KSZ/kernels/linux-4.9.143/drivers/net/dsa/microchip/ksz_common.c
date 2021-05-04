@@ -166,6 +166,7 @@ void ksz_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *buf)
 	mutex_lock(&mib->cnt_mutex);
 	port_r_cnt(dev, port);
 	memcpy(buf, mib->counters, dev->mib_cnt * sizeof(u64));
+        memset(mib->counters, 0, dev->mib_cnt * sizeof(u64));
 	mutex_unlock(&mib->cnt_mutex);
 }
 EXPORT_SYMBOL_GPL(ksz_get_ethtool_stats);

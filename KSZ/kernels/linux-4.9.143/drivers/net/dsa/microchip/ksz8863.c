@@ -1120,7 +1120,7 @@ static int ksz8863_setup(struct dsa_switch *ds)
 
 	ksz8863_w_sta_mac_table(dev, 0, &alu);
 
-	ksz_init_mib_timer(dev);
+	//ksz_init_mib_timer(dev);
 
 	return 0;
 }
