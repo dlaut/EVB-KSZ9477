@@ -189,7 +189,7 @@
 							label = "cpu";
 							ethernet = <&macb1>;
 							fixed-link {
-								speed = <100>;
+								speed = <10>;
 								full-duplex;
 							};
 						};
@@ -257,7 +257,7 @@
 				status = "okay";
 
 				fixed-link {
-					speed = <100>;
+					speed = <10>;
 					full-duplex;
 				};
 			};

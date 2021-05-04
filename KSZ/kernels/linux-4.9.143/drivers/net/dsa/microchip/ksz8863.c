@@ -1089,6 +1089,9 @@ static int ksz8863_setup(struct dsa_switch *ds)
 
 	ksz_cfg(dev, S_MIRROR_CTRL, SW_MIRROR_RX_TX, false);
 
+	/* set MII 10Mbps mode */
+	ksz_cfg(dev, REG_SW_CTRL_4, SW_10_MBIT, true);
+
 	/* set broadcast storm protection 10% rate */
 	data8 = BROADCAST_STORM_PROT_RATE;
 	value = ((u32)BROADCAST_STORM_VALUE * data8) / 100;
